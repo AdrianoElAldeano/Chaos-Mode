@@ -52,7 +52,7 @@ public class AnomalyHandler : CustomEventsHandler
     private void TriggerRandomAnomaly()
     {
         // Cambiar numeros entre parentesis dependiendo de los eventos que tenga, ej: 10 eventos = (0, 10)
-        int randomPick = UnityEngine.Random.Range(0, 3);
+        int randomPick = UnityEngine.Random.Range(0, 4);
 
         switch (randomPick)
         {
@@ -90,6 +90,19 @@ public class AnomalyHandler : CustomEventsHandler
                 playBackground: true
             );
             Timing.RunCoroutine(BlackoutAnomaly(60f)); 
+            break;
+
+            case 3:
+            // --- ANOMALÍA 4: DISCOTECA ---
+            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando anomalía de HACKEO DE LUCES");
+                
+            Announcer.Message(
+                "pitch_0.2 .g4 .g4 pitch_0.9 system breach detected in light control protocols", 
+                "Brecha del sistema detectada en los protocolos de control de luces.", 
+                playBackground: true
+            );
+                
+            Timing.RunCoroutine(DiscoAnomaly(60f)); 
             break;
         }
     }
@@ -190,5 +203,43 @@ public class AnomalyHandler : CustomEventsHandler
             playBackground: true
         );
         LabApi.Features.Console.Logger.Info("Chaos Mode: Anomalia APAGON finalizado.");
+    }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Anomalía HACKEO DE LUCES (DISCOTECA)
+    private IEnumerator<float> DiscoAnomaly(float duration)
+    {
+        float timePassed = 0f;
+        float interval = 0.5f;
+
+        while (timePassed < duration)
+        {
+            foreach (Room room in Room.List)
+            {
+                if (room.LightController != null)
+                {
+                    Color randomColor = new Color(
+                        UnityEngine.Random.value,
+                        UnityEngine.Random.value,
+                        UnityEngine.Random.value
+                        );
+                    room.LightController.OverrideLightsColor = randomColor;
+                }
+            }
+            yield return Timing.WaitForSeconds(interval);
+            timePassed += interval;
+        }
+
+        foreach (Room room in Room.List)
+        {
+            if (room.LightController != null)
+            {
+                room.LightController.OverrideLightsColor = Color.clear;
+            }
+        }
+        Announcer.Message(
+            "pitch_0.2 .g4 .g4 pitch_1.0 light control protocols restored", 
+            "Protocolos de control de luces restaurados.", 
+            playBackground: true
+        );
     }
 }
