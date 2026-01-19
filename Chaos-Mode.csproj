@@ -71,6 +71,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="AnomalyHandler.cs" />
+        <Compile Include="ChaosCommand.cs" />
         <Compile Include="Chaos_Mode.cs" />
         <Compile Include="EventHandler.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>

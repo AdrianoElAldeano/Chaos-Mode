@@ -9,6 +9,15 @@ namespace Chaos_Mode;
 public class AnomalyHandler : CustomEventsHandler
 {
     private CoroutineHandle _anomalyCoroutine;
+    
+    public static AnomalyHandler Instance { get; private set; }
+    
+    public bool IsPaused { get; set; } = false;
+
+    public AnomalyHandler()
+    {
+        Instance = this;
+    }
 
     public override void OnServerRoundStarted()
     
@@ -38,7 +47,13 @@ public class AnomalyHandler : CustomEventsHandler
 
         while (true)
         {
-            TriggerRandomAnomaly();
+            if (IsPaused)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                continue;
+            }
+            
+            TriggerRandomAnomaly(-1);
 
             // Espera de 4 a 7 minutos para la siguiente anomalia (después de la primera anomalia)
             float nextWait = UnityEngine.Random.Range(240f, 420f);
@@ -49,12 +64,15 @@ public class AnomalyHandler : CustomEventsHandler
 
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Selector de Anomalías 
-    private void TriggerRandomAnomaly()
+    public void TriggerRandomAnomaly(int forceId = -1)
     {
+        int pick = forceId;
         // Cambiar numeros entre parentesis dependiendo de los eventos que tenga, ej: 10 eventos = (0, 10)
-        int randomPick = UnityEngine.Random.Range(0, 4);
-
-        switch (randomPick)
+        if (pick == -1)
+        {
+            pick = UnityEngine.Random.Range(0, 4);
+        }
+        switch (pick)
         {
             // --- ANOMALÍA 1: FANTASMA ---
             case 0:
