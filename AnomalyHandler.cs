@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using CommandSystem.Commands.RemoteAdmin;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
+using RemoteAdmin;
 using UnityEngine;
 
 namespace Chaos_Mode;
@@ -203,17 +205,9 @@ public class AnomalyHandler : CustomEventsHandler
     // Anomalía de APAGON (BLACKOUT)
     private IEnumerator<float> BlackoutAnomaly(float duration)
     {
-        float timePassed = 0f;
-
-        while (timePassed < duration)
-        {
-            foreach (Room room in Room.List)
-            {
-                room.LightController.FlickerLights(5.0f);
-            }
-        }
-        yield return Timing.WaitForSeconds(1f);
-        timePassed += 1f;
+        Map.TurnOffLights(60f);
+        
+        yield return Timing.WaitForSeconds(duration);
         
         Announcer.Message(
             "pitch_0.2 .g4 .g4 pitch_1.0 facility power system stabilized", 
