@@ -269,31 +269,47 @@ public class AnomalyHandler : CustomEventsHandler
     }
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Anomalía ENANOS
-    private IEnumerator<float> SmallAnomaly(float duration)
-    {
-        float timePassed = 0f;
-        float checkInterval = 0.1f;
-        
-        Vector3 smallScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-        while (timePassed < duration)
+        private IEnumerator<float> SmallAnomaly(float duration)
         {
+            float timePassed = 0f;
+            float checkInterval = 0.5f;
+            Vector3 smallScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            while (timePassed < duration)
+            {
+                foreach (Player player in Player.List)
+                {
+                    try
+                    {
+                        if (player.IsAlive)
+                        {
+                            if (Vector3.Distance(player.Scale, smallScale) > 0.05f)
+                            {
+                                player.Scale = smallScale;
+                            }
+                        }
+                    }
+                    catch (System.Exception)
+                    {
+                        continue;
+                    }
+                }
+
+                yield return Timing.WaitForSeconds(checkInterval);
+                timePassed += checkInterval;
+            }
+            
             foreach (Player player in Player.List)
             {
-                if (player.IsAlive && player.Scale != smallScale)
+                try
                 {
-                    player.Scale = smallScale;
+                    if(player.IsAlive) 
+                    {
+                        player.Scale = Vector3.one;
+                    }
                 }
+                catch { }
             }
-
-            yield return Timing.WaitForSeconds(duration);
-            timePassed += checkInterval;
-        }
-
-        foreach (Player player in Player.List)
-        {
-            player.Scale = new Vector3(1, 1, 1);
-        }
         Announcer.Message(
             "pitch_0.2 .g4 .g4 pitch_1.0 all human and scp are now normal height",
             "Todos los humanos y scp ahora tienen una altura normal",
