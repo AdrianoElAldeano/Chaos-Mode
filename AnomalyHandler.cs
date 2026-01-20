@@ -72,7 +72,7 @@ public class AnomalyHandler : CustomEventsHandler
         // Cambiar numeros entre parentesis dependiendo de los eventos que tenga, ej: 10 eventos = (0, 10)
         if (pick == -1)
         {
-            pick = UnityEngine.Random.Range(0, 4);
+            pick = UnityEngine.Random.Range(0, 5);
         }
         switch (pick)
         {
@@ -123,6 +123,19 @@ public class AnomalyHandler : CustomEventsHandler
             );
                 
             Timing.RunCoroutine(DiscoAnomaly(60f)); 
+            break;
+            
+            case 4:
+            // --- ANOMALíA 5: ENANOS ---
+            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de ENANOS");
+                
+            Announcer.Message(
+                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological structure integrity compromised",
+                "Atención. Integridad de estructura biológica comprometida.",
+                playBackground: true
+            );
+            
+            Timing.RunCoroutine(SmallAnomaly(duration: 90f));
             break;
         }
     }
@@ -251,6 +264,29 @@ public class AnomalyHandler : CustomEventsHandler
         Announcer.Message(
             "pitch_0.2 .g4 .g4 pitch_1.0 light control protocols restored", 
             "Protocolos de control de luces restaurados.", 
+            playBackground: true
+        );
+    }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Anomalía ENANOS
+    private IEnumerator<float> SmallAnomaly(float duration)
+    {
+        foreach (Player player in Player.List)
+        {
+            if (player.IsAlive)
+            {
+                player.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            }
+        }
+        yield return Timing.WaitForSeconds(duration);
+
+        foreach (Player player in Player.List)
+        {
+            player.Scale = new Vector3(1, 1, 1);
+        }
+        Announcer.Message(
+            "pitch_0.2 .g4 .g4 pitch_1.0 biological structure integrity restored",
+            "Integridad de estructura biológica restaurada.",
             playBackground: true
         );
     }

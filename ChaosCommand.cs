@@ -100,7 +100,14 @@ public class ChaosCommand : ICommand
                 AnomalyHandler.Instance.TriggerRandomAnomaly(3);
                 response = "Forzando evento: DISCO / HACKEO";
                 return true;
-
+            
+            case "small":
+            case "enano":
+            case "4":
+                AnomalyHandler.Instance.TriggerRandomAnomaly(4);
+                response = "Forzando evento: ENANO";
+                return true;
+                
             default:
                 response = $"El evento '{name}' no existe. Intenta: fantasma, velocidad, apagon, disco.";
                 return false;
