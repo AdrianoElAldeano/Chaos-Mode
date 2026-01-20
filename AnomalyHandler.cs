@@ -130,8 +130,8 @@ public class AnomalyHandler : CustomEventsHandler
             LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de ENANOS");
                 
             Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological structure integrity compromised",
-                "Atención. Integridad de estructura biológica comprometida.",
+                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be 0.5 METERS",
+                "Atención. Peligro biológico detectado. Todos los humanos y scp serán de 0,5 metros.",
                 playBackground: true
             );
             
@@ -285,8 +285,8 @@ public class AnomalyHandler : CustomEventsHandler
             player.Scale = new Vector3(1, 1, 1);
         }
         Announcer.Message(
-            "pitch_0.2 .g4 .g4 pitch_1.0 biological structure integrity restored",
-            "Integridad de estructura biológica restaurada.",
+            "pitch_0.2 .g4 .g4 pitch_1.0 all human and scp are now normal height",
+            "Todos los humanos y scp ahora tienen una altura normal",
             playBackground: true
         );
     }
