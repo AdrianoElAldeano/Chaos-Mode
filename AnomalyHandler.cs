@@ -271,14 +271,24 @@ public class AnomalyHandler : CustomEventsHandler
     // Anomalía ENANOS
     private IEnumerator<float> SmallAnomaly(float duration)
     {
-        foreach (Player player in Player.List)
+        float timePassed = 0f;
+        float checkInterval = 0.1f;
+        
+        Vector3 smallScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+        while (timePassed < duration)
         {
-            if (player.IsAlive)
+            foreach (Player player in Player.List)
             {
-                player.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+                if (player.IsAlive && player.Scale != smallScale)
+                {
+                    player.Scale = smallScale;
+                }
             }
+
+            yield return Timing.WaitForSeconds(duration);
+            timePassed += checkInterval;
         }
-        yield return Timing.WaitForSeconds(duration);
 
         foreach (Player player in Player.List)
         {
