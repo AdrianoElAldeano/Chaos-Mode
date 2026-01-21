@@ -72,7 +72,7 @@ public class AnomalyHandler : CustomEventsHandler
         // Cambiar numeros entre parentesis dependiendo de los eventos que tenga, ej: 10 eventos = (0, 10)
         if (pick == -1)
         {
-            pick = UnityEngine.Random.Range(0, 5);
+            pick = UnityEngine.Random.Range(0, 6);
         }
         switch (pick)
         {
@@ -130,13 +130,26 @@ public class AnomalyHandler : CustomEventsHandler
             LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de ENANOS");
                 
             Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be 0.5 METERS",
-                "Atención. Peligro biológico detectado. Todos los humanos y scp serán de 0,5 metros.",
+                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be smaller",
+                "Atención. Peligro biológico detectado. Todos los humanos y scp serán más pequeños.",
                 playBackground: true
             );
             
             Timing.RunCoroutine(SmallAnomaly(duration: 90f));
             break;
+            
+            case 5:
+            // --- ANOMALíA 6: GIGANTES ---
+            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de GIGANTES");
+                
+            Announcer.Message(
+                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be bigger",
+                "Atención. Peligro biológico detectado. Todos los humanos y scp serán más grandes.",
+                playBackground: true
+            );
+                
+                Timing.RunCoroutine(GigantAnomaly(duration: 90f));
+                break;
         }
     }
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,4 +329,53 @@ public class AnomalyHandler : CustomEventsHandler
             playBackground: true
         );
     }
+        // /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Anomalía GIGANTES
+        private IEnumerator<float> GigantAnomaly(float duration)
+        {
+            float timePassed = 0f;
+            float checkInterval = 0.5f;
+            Vector3 gigantScale = new Vector3(1.15f, 1.15f, 1.15f);
+
+            while (timePassed < duration)
+            {
+                foreach (Player player in Player.List)
+                {
+                    try
+                    {
+                        if (player.IsAlive)
+                        {
+                            if (Vector3.Distance(player.Scale, gigantScale) > 0.05f)
+                            {
+                                player.Scale = gigantScale;
+                            }
+                        }
+                    }
+                    catch (System.Exception)
+                    {
+                        continue;
+                    }
+                }
+
+                yield return Timing.WaitForSeconds(checkInterval);
+                timePassed += checkInterval;
+            }
+            
+            foreach (Player player in Player.List)
+            {
+                try
+                {
+                    if(player.IsAlive) 
+                    {
+                        player.Scale = Vector3.one;
+                    }
+                }
+                catch { }
+            }
+            Announcer.Message(
+                "pitch_0.2 .g4 .g4 pitch_1.0 all human and scp are now normal height",
+                "Todos los humanos y scp ahora tienen una altura normal",
+                playBackground: true
+            );
+        }
 }

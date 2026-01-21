@@ -107,9 +107,16 @@ public class ChaosCommand : ICommand
                 AnomalyHandler.Instance.TriggerRandomAnomaly(4);
                 response = "Forzando evento: ENANO";
                 return true;
+            
+            case "gigant":
+            case "gigante":
+            case "5":
+                AnomalyHandler.Instance.TriggerRandomAnomaly(5);
+                response = "Forzando evento: GIGANTE";
+                return true;
                 
             default:
-                response = $"El evento '{name}' no existe. Intenta: fantasma, velocidad, apagon, disco.";
+                response = $"El evento '{name}' no existe. Intenta: fantasma, velocidad, apagon, disco, enano, gigante.";
                 return false;
         }
     }
