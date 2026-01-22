@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CommandSystem.Commands.RemoteAdmin;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
@@ -72,7 +73,7 @@ public class AnomalyHandler : CustomEventsHandler
         // Cambiar numeros entre parentesis dependiendo de los eventos que tenga, ej: 10 eventos = (0, 10)
         if (pick == -1)
         {
-            pick = UnityEngine.Random.Range(0, 6);
+            pick = UnityEngine.Random.Range(0, 7);
         }
         switch (pick)
         {
@@ -131,7 +132,7 @@ public class AnomalyHandler : CustomEventsHandler
                 
             Announcer.Message(
                 "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be smaller",
-                "Atención. Peligro biológico detectado. Todos los humanos y scp serán más pequeños.",
+                "Atención, peligro biológico detectado. Todos los humanos y scp serán más pequeños.",
                 playBackground: true
             );
             
@@ -144,12 +145,25 @@ public class AnomalyHandler : CustomEventsHandler
                 
             Announcer.Message(
                 "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be bigger",
-                "Atención. Peligro biológico detectado. Todos los humanos y scp serán más grandes.",
+                "Atención, peligro biológico detectado. Todos los humanos y scp serán más grandes.",
                 playBackground: true
             );
                 
                 Timing.RunCoroutine(GigantAnomaly(duration: 90f));
                 break;
+
+            case 6:
+            // --- ANOMALíA 7: PUERTAS LOCAS ---
+            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía PUERTAS LOCAS");
+                
+            Announcer.Message(
+                "pitch_0.2 .g4 .g4 pitch_1.0 attention . door control system failure detected",
+                "Atención, se detectó una falla en el sistema de control de la puerta",
+                playBackground: true
+            );
+                
+            Timing.RunCoroutine(CrazyDoorsAnomaly(duration: 60f));
+            break;
         }
     }
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -378,4 +392,32 @@ public class AnomalyHandler : CustomEventsHandler
                 playBackground: true
             );
         }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Anomalía PUERTAS LOCAS
+
+    private IEnumerator<float> CrazyDoorsAnomaly(float duration)
+    {
+        float timePassed = 0f;
+        float interval = 0.3f;
+
+        while (timePassed < duration)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var randomDoor = Door.List.ElementAtOrDefault(UnityEngine.Random.Range(0, Door.List.Count));
+
+                if (randomDoor != null)
+                {
+                    randomDoor.IsOpened = !randomDoor.IsOpened;
+                }
+            }
+            yield return Timing.WaitForSeconds(interval);
+            timePassed += interval;
+        }
+        Announcer.Message(
+            "pitch_0.2 .g4 .g4 pitch_1.0 door control systems back online",
+            "Los sistemas de control de puertas vuelven a estar en línea",
+            playBackground: true
+        );
+    }
 }

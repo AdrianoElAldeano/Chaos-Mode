@@ -98,7 +98,7 @@ public class ChaosCommand : ICommand
             case "luces":
             case "3":
                 AnomalyHandler.Instance.TriggerRandomAnomaly(3);
-                response = "Forzando evento: DISCO / HACKEO";
+                response = "Forzando evento: DISCO";
                 return true;
             
             case "small":
@@ -113,6 +113,13 @@ public class ChaosCommand : ICommand
             case "5":
                 AnomalyHandler.Instance.TriggerRandomAnomaly(5);
                 response = "Forzando evento: GIGANTE";
+                return true;
+            
+            case "door":
+            case "puerta":
+            case "6":
+                AnomalyHandler.Instance.TriggerRandomAnomaly(6);
+                response = "Forzando evento: PUERTAS LOCAS";
                 return true;
                 
             default:
