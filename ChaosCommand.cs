@@ -121,9 +121,17 @@ public class ChaosCommand : ICommand
                 AnomalyHandler.Instance.TriggerRandomAnomaly(6);
                 response = "Forzando evento: PUERTAS LOCAS";
                 return true;
+            
+            case "swap":
+            case "teletransporte":
+            case "tp":    
+            case "7":
+                AnomalyHandler.Instance.TriggerRandomAnomaly(7);
+                response = "Forzando evento: TELETRANSPORTE";
+                return true;
                 
             default:
-                response = $"El evento '{name}' no existe. Intenta: fantasma, velocidad, apagon, disco, enano, gigante.";
+                response = $"El evento '{name}' no existe. Intenta: fantasma, velocidad, apagon, disco, enano, gigante, etc...";
                 return false;
         }
     }

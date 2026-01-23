@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CommandSystem.Commands.RemoteAdmin;
+using HintServiceMeow.Core.Enum;
+using HintServiceMeow.Core.Extension;
+using HintServiceMeow.Core.Models.Hints;
+using HintServiceMeow.Core.Utilities;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
+using PlayerRoles;
 using RemoteAdmin;
 using UnityEngine;
 
@@ -73,7 +78,7 @@ public class AnomalyHandler : CustomEventsHandler
         // Cambiar numeros entre parentesis dependiendo de los eventos que tenga, ej: 10 eventos = (0, 10)
         if (pick == -1)
         {
-            pick = UnityEngine.Random.Range(0, 7);
+            pick = UnityEngine.Random.Range(0, 8);
         }
         switch (pick)
         {
@@ -127,7 +132,7 @@ public class AnomalyHandler : CustomEventsHandler
             break;
             
             case 4:
-            // --- ANOMALíA 5: ENANOS ---
+            // --- ANOMALÍA 5: ENANOS ---
             LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de ENANOS");
                 
             Announcer.Message(
@@ -140,7 +145,7 @@ public class AnomalyHandler : CustomEventsHandler
             break;
             
             case 5:
-            // --- ANOMALíA 6: GIGANTES ---
+            // --- ANOMALÍA 6: GIGANTES ---
             LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de GIGANTES");
                 
             Announcer.Message(
@@ -153,7 +158,7 @@ public class AnomalyHandler : CustomEventsHandler
                 break;
 
             case 6:
-            // --- ANOMALíA 7: PUERTAS LOCAS ---
+            // --- ANOMALÍA 7: PUERTAS LOCAS ---
             LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía PUERTAS LOCAS");
                 
             Announcer.Message(
@@ -163,6 +168,19 @@ public class AnomalyHandler : CustomEventsHandler
             );
                 
             Timing.RunCoroutine(CrazyDoorsAnomaly(duration: 60f));
+            break;
+            
+            case 7:
+            // --- ANOMALÍA 8: TELETRANSPORTE ---   
+            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía TELETRANSPORTE");
+            
+            Announcer.Message(
+                "pitch_0.2 .g4 .g4 pitch_1.0 Attention . unstable spatial coordinates",
+                "Atención, coordenadas espaciales inestables",
+                playBackground: true
+            );
+                
+            Timing.RunCoroutine(SwapAnomaly(duration: 60f));
             break;
         }
     }
@@ -419,5 +437,75 @@ public class AnomalyHandler : CustomEventsHandler
             "Los sistemas de control de puertas vuelven a estar en línea",
             playBackground: true
         );
+    }
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Anomalía TELETRANSPORTE
+    private IEnumerator<float> SwapAnomaly(float duration)
+    {
+        float timePassed = 0f;
+    float swapInterval = 5f; 
+    
+    List<int> swappedPlayerIds = new List<int>();
+
+    while (timePassed < duration)
+    {
+        List<Player> validPlayers = Player.List
+            .Where(p => p.IsAlive && p.Role != RoleTypeId.Scp079 && !swappedPlayerIds.Contains(p.PlayerId))
+            .ToList();
+        
+        if (validPlayers.Count >= 2)
+        {
+            int numberOfSwaps = validPlayers.Count / 2;
+
+            for (int i = 0; i < numberOfSwaps; i++)
+            {
+                if (validPlayers.Count < 2) break;
+
+                // Jugador A
+                int indexA = UnityEngine.Random.Range(0, validPlayers.Count);
+                Player playerA = validPlayers[indexA];
+                validPlayers.RemoveAt(indexA);
+                // Jugador B
+                int indexB = UnityEngine.Random.Range(0, validPlayers.Count);
+                Player playerB = validPlayers[indexB];
+                validPlayers.RemoveAt(indexB);
+
+                // Registro de los que ya hicieron TP
+                swappedPlayerIds.Add(playerA.PlayerId);
+                swappedPlayerIds.Add(playerB.PlayerId);
+                
+                Vector3 posA = playerA.Position;
+                Vector3 posB = playerB.Position;
+
+                playerA.Position = posB;
+                playerB.Position = posA;
+
+                // Hint
+                Hint swapHint = new Hint();
+                swapHint.Alignment = HintAlignment.Center;
+                swapHint.YCoordinate = 50; 
+                swapHint.Text = "<color=yellow><b>¡Intercambio Espacial!</b></color>";
+                swapHint.HideAfter(4f);
+
+                PlayerDisplay displayA = PlayerDisplay.Get(playerA);
+                if (displayA != null) displayA.AddHint(swapHint);
+
+                PlayerDisplay displayB = PlayerDisplay.Get(playerB);
+                if (displayB != null) displayB.AddHint(swapHint);
+            }
+            
+            // Sonido cuando se hace TP
+            Announcer.Message("pitch_1.5 .g4", "", false);
+        }
+
+        yield return Timing.WaitForSeconds(swapInterval);
+        timePassed += swapInterval;
+    }
+
+    Announcer.Message(
+        "pitch_0.2 .g4 .g4 pitch_1.0 spatial coordinates stabilized",
+        "Coordenadas espaciales estabilizadas.",
+        playBackground: true
+    );
     }
 }
