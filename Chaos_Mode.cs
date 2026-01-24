@@ -14,17 +14,20 @@ namespace Chaos_Mode
         public override Version RequiredApiVersion => new Version(LabApiProperties.CompiledVersion);
         public EventHandler EventHandler = new EventHandler();
         public AnomalyHandler AnomalyHandler = new AnomalyHandler(); 
+        public VampireHandler VampireHandler = new VampireHandler();
         
         public override void Enable()
         {
             CustomHandlersManager.RegisterEventsHandler(EventHandler);
             CustomHandlersManager.RegisterEventsHandler(AnomalyHandler);
+            CustomHandlersManager.RegisterEventsHandler(VampireHandler);
         }
 
         public override void Disable()
         {
             CustomHandlersManager.UnregisterEventsHandler(EventHandler);
             CustomHandlersManager.UnregisterEventsHandler(AnomalyHandler);
+            CustomHandlersManager.UnregisterEventsHandler(VampireHandler);
         }
     }
 }
