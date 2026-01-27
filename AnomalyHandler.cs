@@ -415,21 +415,33 @@ public class AnomalyHandler : CustomEventsHandler
     {
         float timePassed = 0f;
         float interval = 0.3f;
+        
+        var validDoors = Door.List
+            .Where(d =>
+                d is not ElevatorDoor &&
+                d is not CheckpointDoor
+            )
+            .ToList();
+
 
         while (timePassed < duration)
         {
             for (int i = 0; i < 10; i++)
             {
-                var randomDoor = Door.List.ElementAtOrDefault(UnityEngine.Random.Range(0, Door.List.Count));
-
-                if (randomDoor != null)
+                if (validDoors.Count > 0)
                 {
-                    randomDoor.IsOpened = !randomDoor.IsOpened;
+                    var randomDoor = validDoors[UnityEngine.Random.Range(0, validDoors.Count)];
+
+                    if (randomDoor != null)
+                    {
+                        randomDoor.IsOpened = !randomDoor.IsOpened;
+                    }
                 }
             }
             yield return Timing.WaitForSeconds(interval);
             timePassed += interval;
         }
+    
         Announcer.Message(
             "pitch_0.2 .g4 .g4 pitch_1.0 door control systems back online",
             "Los sistemas de control de puertas vuelven a estar en línea",
