@@ -131,7 +131,7 @@ public class EventHandler : CustomEventsHandler
                 Hint hintCuracion = new Hint();
                 hintCuracion.Alignment = HintAlignment.Center;
                 hintCuracion.YCoordinate = 50;
-                hintCuracion.Text = "Has recibido regeneración pasiva (15 HP cada 10s)";
+                hintCuracion.Text = "Has recibido regeneración pasiva (15 HP cada 8s)";
                 hintCuracion.HideAfter(8f);
                 
                 PlayerDisplay playerDisplay = PlayerDisplay.Get(ev.Player);
