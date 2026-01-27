@@ -346,7 +346,7 @@ public class AnomalyHandler : CustomEventsHandler
             {
                 try
                 {
-                    if(player.IsAlive) 
+                    if(player.IsPlayer) 
                     {
                         player.Scale = Vector3.one;
                     }
@@ -395,7 +395,7 @@ public class AnomalyHandler : CustomEventsHandler
             {
                 try
                 {
-                    if(player.IsAlive) 
+                    if(player.IsPlayer) 
                     {
                         player.Scale = Vector3.one;
                     }
