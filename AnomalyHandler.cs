@@ -4,6 +4,7 @@ using HintServiceMeow.Core.Enum;
 using HintServiceMeow.Core.Extension;
 using HintServiceMeow.Core.Models.Hints;
 using HintServiceMeow.Core.Utilities;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using MEC;
@@ -15,10 +16,12 @@ namespace Chaos_Mode;
 public class AnomalyHandler : CustomEventsHandler
 {
     private CoroutineHandle _anomalyCoroutine;
-    
+
     public static AnomalyHandler Instance { get; private set; }
-    
+
     public bool IsPaused { get; set; } = false;
+    
+    private bool _activeSizeAnomaly = false;
 
     public AnomalyHandler()
     {
@@ -26,28 +29,31 @@ public class AnomalyHandler : CustomEventsHandler
     }
 
     public override void OnServerRoundStarted()
-    
+
     {
         LabApi.Features.Console.Logger.Info("Los eventos anomalos se estan iniciando.");
-        
+
         Timing.KillCoroutines(_anomalyCoroutine);
         
+        _activeSizeAnomaly = false;
+
         _anomalyCoroutine = Timing.RunCoroutine(AnomalyCycle());
     }
 
-    public override void OnServerRoundRestarted()
+    public override void OnPlayerDying(PlayerDyingEventArgs ev)
     {
-        Timing.KillCoroutines(_anomalyCoroutine);
-
-        Physics.gravity = new Vector3(0, -9.81f, 0);
+        if (_activeSizeAnomaly)
+        {
+            ev.Player.Scale = Vector3.one;
+        }
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Config tiempo anomalias
     private IEnumerator<float> AnomalyCycle()
     {
-        // Espera entre 3 y 5 minutos para el primer evento
-        float firstWait = UnityEngine.Random.Range(180f, 300f);
+        // Espera entre 45sec y 1.30minutos para el primer evento
+        float firstWait = UnityEngine.Random.Range(45f, 90f);
 
         yield return Timing.WaitForSeconds(firstWait);
 
@@ -58,11 +64,11 @@ public class AnomalyHandler : CustomEventsHandler
                 yield return Timing.WaitForSeconds(1f);
                 continue;
             }
-            
+
             TriggerRandomAnomaly(-1);
 
-            // Espera de 4 a 7 minutos para la siguiente anomalia (después de la primera anomalia)
-            float nextWait = UnityEngine.Random.Range(240f, 420f);
+            // Espera de 2 a 3.30 minutos para la siguiente anomalia (después de la primera anomalia)
+            float nextWait = UnityEngine.Random.Range(120f, 210f);
 
             yield return Timing.WaitForSeconds(nextWait);
         }
@@ -78,6 +84,7 @@ public class AnomalyHandler : CustomEventsHandler
         {
             pick = UnityEngine.Random.Range(0, 8);
         }
+
         switch (pick)
         {
             // --- ANOMALÍA 1: FANTASMA ---
@@ -105,81 +112,81 @@ public class AnomalyHandler : CustomEventsHandler
                 break;
 
             case 2:
-            // --- ANOMALÍA 3: APAGON ---
-            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando anomalía de APAGON");
+                // --- ANOMALÍA 3: APAGON ---
+                LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando anomalía de APAGON");
 
-            Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 facility power system failure detected", 
-                "Falla detectada en el sistema de energía de la instalación.", 
-                playBackground: true
-            );
-            Timing.RunCoroutine(BlackoutAnomaly(60f)); 
-            break;
+                Announcer.Message(
+                    "pitch_0.2 .g4 .g4 pitch_1.0 facility power system failure detected",
+                    "Falla detectada en el sistema de energía de la instalación.",
+                    playBackground: true
+                );
+                Timing.RunCoroutine(BlackoutAnomaly(60f));
+                break;
 
             case 3:
-            // --- ANOMALÍA 4: DISCOTECA ---
-            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando anomalía de HACKEO DE LUCES");
-                
-            Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_0.9 system breach detected in light control protocols", 
-                "Brecha del sistema detectada en los protocolos de control de luces.", 
-                playBackground: true
-            );
-                
-            Timing.RunCoroutine(DiscoAnomaly(60f)); 
-            break;
-            
+                // --- ANOMALÍA 4: DISCOTECA ---
+                LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando anomalía de HACKEO DE LUCES");
+
+                Announcer.Message(
+                    "pitch_0.2 .g4 .g4 pitch_0.9 system breach detected in light control protocols",
+                    "Brecha del sistema detectada en los protocolos de control de luces.",
+                    playBackground: true
+                );
+
+                Timing.RunCoroutine(DiscoAnomaly(60f));
+                break;
+
             case 4:
-            // --- ANOMALÍA 5: ENANOS ---
-            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de ENANOS");
-                
-            Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be smaller",
-                "Atención, peligro biológico detectado. Todos los humanos y scp serán más pequeños.",
-                playBackground: true
-            );
-            
-            Timing.RunCoroutine(SmallAnomaly(duration: 90f));
-            break;
-            
+                // --- ANOMALÍA 5: ENANOS ---
+                LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de ENANOS");
+
+                Announcer.Message(
+                    "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be smaller",
+                    "Atención, peligro biológico detectado. Todos los humanos y scp serán más pequeños.",
+                    playBackground: true
+                );
+
+                Timing.RunCoroutine(SmallAnomaly(duration: 90f));
+                break;
+
             case 5:
-            // --- ANOMALÍA 6: GIGANTES ---
-            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de GIGANTES");
-                
-            Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be bigger",
-                "Atención, peligro biológico detectado. Todos los humanos y scp serán más grandes.",
-                playBackground: true
-            );
-                
+                // --- ANOMALÍA 6: GIGANTES ---
+                LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía de GIGANTES");
+
+                Announcer.Message(
+                    "pitch_0.2 .g4 .g4 pitch_1.0 attention . biological hazard detected. all human and scp will be bigger",
+                    "Atención, peligro biológico detectado. Todos los humanos y scp serán más grandes.",
+                    playBackground: true
+                );
+
                 Timing.RunCoroutine(GigantAnomaly(duration: 90f));
                 break;
 
             case 6:
-            // --- ANOMALÍA 7: PUERTAS LOCAS ---
-            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía PUERTAS LOCAS");
-                
-            Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 attention . door control system failure detected",
-                "Atención, se detectó una falla en el sistema de control de la puerta",
-                playBackground: true
-            );
-                
-            Timing.RunCoroutine(CrazyDoorsAnomaly(duration: 60f));
-            break;
-            
+                // --- ANOMALÍA 7: PUERTAS LOCAS ---
+                LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía PUERTAS LOCAS");
+
+                Announcer.Message(
+                    "pitch_0.2 .g4 .g4 pitch_1.0 attention . door control system failure detected",
+                    "Atención, se detectó una falla en el sistema de control de la puerta",
+                    playBackground: true
+                );
+
+                Timing.RunCoroutine(CrazyDoorsAnomaly(duration: 60f));
+                break;
+
             case 7:
-            // --- ANOMALÍA 8: TELETRANSPORTE ---   
-            LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía TELETRANSPORTE");
-            
-            Announcer.Message(
-                "pitch_0.2 .g4 .g4 pitch_1.0 Attention . unstable spatial coordinates",
-                "Atención, coordenadas espaciales inestables",
-                playBackground: true
-            );
-                
-            Timing.RunCoroutine(SwapAnomaly(duration: 60f));
-            break;
+                // --- ANOMALÍA 8: TELETRANSPORTE ---   
+                LabApi.Features.Console.Logger.Info("Chaos Mode: Iniciando Anomalía TELETRANSPORTE");
+
+                Announcer.Message(
+                    "pitch_0.2 .g4 .g4 pitch_1.0 Attention . unstable spatial coordinates",
+                    "Atención, coordenadas espaciales inestables",
+                    playBackground: true
+                );
+
+                Timing.RunCoroutine(SwapAnomaly(duration: 60f));
+                break;
         }
     }
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -196,18 +203,18 @@ public class AnomalyHandler : CustomEventsHandler
             {
                 if (p.IsAlive)
                 {
-                    
+
                     p.EnableEffect<CustomPlayerEffects.Ghostly>(1, 5f);
                 }
             }
-            
+
             yield return Timing.WaitForSeconds(1f);
             timePassed += 1f;
         }
-        
+
         Announcer.Message(
-            "pitch_0.2 .g4 .g4 pitch_1.0 Stabilized physics systems.", 
-            "Sistemas de física estabilizados.", 
+            "pitch_0.2 .g4 .g4 pitch_1.0 Stabilized physics systems.",
+            "Sistemas de física estabilizados.",
             playBackground: true
         );
         yield return Timing.WaitForSeconds(2f);
@@ -215,8 +222,10 @@ public class AnomalyHandler : CustomEventsHandler
         {
             if (p.IsAlive) p.DisableEffect<CustomPlayerEffects.Ghostly>();
         }
+
         LabApi.Features.Console.Logger.Info("Chaos Mode: Anomalia FANTASMA finalizado.");
     }
+
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Anomalía de Velocidad
     private IEnumerator<float> SpeedAnomaly(float duration)
@@ -234,12 +243,12 @@ public class AnomalyHandler : CustomEventsHandler
                     p.EnableEffect<CustomPlayerEffects.MovementBoost>(30, 5f);
                 }
             }
-            
+
             yield return Timing.WaitForSeconds(1f);
             // Aquí añade el tiempo para calcular cuanto tiempo de efecto tiene que ponerle a los que hagan spawn.
             timePassed += 1f;
         }
-        
+
         yield return Timing.WaitForSeconds(2f);
 
         foreach (Player p in Player.List)
@@ -249,29 +258,31 @@ public class AnomalyHandler : CustomEventsHandler
                 p.DisableEffect<CustomPlayerEffects.MovementBoost>();
             }
         }
-        
+
         Announcer.Message(
-            "pitch_0.2 .g4 .g4 pitch_1.0 The adrenaline effect has end.", 
-            "El efecto de la adrenalina ha terminado.", 
+            "pitch_0.2 .g4 .g4 pitch_1.0 The adrenaline effect has end.",
+            "El efecto de la adrenalina ha terminado.",
             playBackground: true
         );
         LabApi.Features.Console.Logger.Info("Chaos Mode: Anomalia VELOCIDAD finalizado.");
     }
+
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Anomalía de APAGON (BLACKOUT)
     private IEnumerator<float> BlackoutAnomaly(float duration)
     {
         Map.TurnOffLights(60f);
-        
+
         yield return Timing.WaitForSeconds(duration);
-        
+
         Announcer.Message(
-            "pitch_0.2 .g4 .g4 pitch_1.0 facility power system stabilized", 
-            "Sistema de energía de la instalación estabilizado.", 
+            "pitch_0.2 .g4 .g4 pitch_1.0 facility power system stabilized",
+            "Sistema de energía de la instalación estabilizado.",
             playBackground: true
         );
         LabApi.Features.Console.Logger.Info("Chaos Mode: Anomalia APAGON finalizado.");
     }
+
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Anomalía HACKEO DE LUCES (DISCOTECA)
     private IEnumerator<float> DiscoAnomaly(float duration)
@@ -289,10 +300,11 @@ public class AnomalyHandler : CustomEventsHandler
                         UnityEngine.Random.value,
                         UnityEngine.Random.value,
                         UnityEngine.Random.value
-                        );
+                    );
                     room.LightController.OverrideLightsColor = randomColor;
                 }
             }
+
             yield return Timing.WaitForSeconds(interval);
             timePassed += interval;
         }
@@ -304,65 +316,77 @@ public class AnomalyHandler : CustomEventsHandler
                 room.LightController.OverrideLightsColor = Color.clear;
             }
         }
+
         Announcer.Message(
-            "pitch_0.2 .g4 .g4 pitch_1.0 light control protocols restored", 
-            "Protocolos de control de luces restaurados.", 
+            "pitch_0.2 .g4 .g4 pitch_1.0 light control protocols restored",
+            "Protocolos de control de luces restaurados.",
             playBackground: true
         );
     }
+
     // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Anomalía ENANOS
-        private IEnumerator<float> SmallAnomaly(float duration)
+    private IEnumerator<float> SmallAnomaly(float duration)
+    {
+        _activeSizeAnomaly = true;
+        
+        float timePassed = 0f;
+        float checkInterval = 0.5f;
+        Vector3 smallScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+        while (timePassed < duration)
         {
-            float timePassed = 0f;
-            float checkInterval = 0.5f;
-            Vector3 smallScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            while (timePassed < duration)
-            {
-                foreach (Player player in Player.List)
-                {
-                    try
-                    {
-                        if (player.IsAlive)
-                        {
-                            if (Vector3.Distance(player.Scale, smallScale) > 0.05f)
-                            {
-                                player.Scale = smallScale;
-                            }
-                        }
-                    }
-                    catch (System.Exception)
-                    {
-                        continue;
-                    }
-                }
-
-                yield return Timing.WaitForSeconds(checkInterval);
-                timePassed += checkInterval;
-            }
-            
             foreach (Player player in Player.List)
             {
                 try
                 {
-                    if(player.IsPlayer) 
+                    if (player.IsAlive)
                     {
-                        player.Scale = Vector3.one;
+                        if (Vector3.Distance(player.Scale, smallScale) > 0.05f)
+                        {
+                            player.Scale = smallScale;
+                        }
                     }
                 }
-                catch { }
+                catch (System.Exception)
+                {
+                    continue;
+                }
             }
+
+            yield return Timing.WaitForSeconds(checkInterval);
+            timePassed += checkInterval;
+        }
+        
+        _activeSizeAnomaly = false;
+
+        foreach (Player player in Player.List)
+        {
+            try
+            {
+                if (player.IsPlayer)
+                {
+                    player.Scale = Vector3.one;
+                }
+            }
+            catch
+            {
+            }
+        }
+
         Announcer.Message(
             "pitch_0.2 .g4 .g4 pitch_1.0 all human and scp are now normal height",
             "Todos los humanos y scp ahora tienen una altura normal",
             playBackground: true
         );
     }
-        // /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Anomalía GIGANTES
+
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Anomalía GIGANTES
         private IEnumerator<float> GigantAnomaly(float duration)
         {
+            _activeSizeAnomaly = true;
+            
             float timePassed = 0f;
             float checkInterval = 0.5f;
             Vector3 gigantScale = new Vector3(1.15f, 1.15f, 1.15f);
@@ -390,6 +414,8 @@ public class AnomalyHandler : CustomEventsHandler
                 yield return Timing.WaitForSeconds(checkInterval);
                 timePassed += checkInterval;
             }
+            
+            _activeSizeAnomaly = false;
             
             foreach (Player player in Player.List)
             {
