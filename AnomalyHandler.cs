@@ -228,7 +228,7 @@ public class AnomalyHandler : CustomEventsHandler
         {
             foreach (Player p in Player.List)
             {
-                if (p.IsAlive)
+                if (p.IsAlive && p.Role !=RoleTypeId.Scp106)
                 {
 
                     p.EnableEffect<CustomPlayerEffects.Ghostly>(1, 5f);
@@ -424,7 +424,7 @@ public class AnomalyHandler : CustomEventsHandler
                 {
                     try
                     {
-                        if (player.IsAlive)
+                        if (player.IsAlive && player.Role != RoleTypeId.Scp106)
                         {
                             if (Vector3.Distance(player.Scale, gigantScale) > 0.05f)
                             {
