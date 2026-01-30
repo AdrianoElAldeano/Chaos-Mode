@@ -16,6 +16,7 @@ namespace Chaos_Mode;
 public class AnomalyHandler : CustomEventsHandler
 {
     private CoroutineHandle _anomalyCoroutine;
+    private CoroutineHandle _currentEventCoroutine;
 
     public static AnomalyHandler Instance { get; private set; }
 
@@ -45,6 +46,32 @@ public class AnomalyHandler : CustomEventsHandler
         if (_activeSizeAnomaly)
         {
             ev.Player.Scale = Vector3.one;
+        }
+    }
+    
+    public override void OnServerRoundRestarted()
+    {
+        StopAllAnomalies();
+    }
+    
+    private void StopAllAnomalies()
+    {
+        Timing.KillCoroutines(_anomalyCoroutine);
+        Timing.KillCoroutines(_currentEventCoroutine);
+        
+        IsPaused = false;
+        _activeSizeAnomaly = false;
+        
+        foreach (Player p in Player.List)
+        {
+            p.Scale = Vector3.one;
+            p.DisableEffect<CustomPlayerEffects.MovementBoost>();
+            p.DisableEffect<CustomPlayerEffects.Ghostly>();
+        }
+        
+        foreach (var room in Room.List)
+        {
+            if(room.LightController != null) room.LightController.OverrideLightsColor = Color.clear;
         }
     }
 
@@ -96,7 +123,7 @@ public class AnomalyHandler : CustomEventsHandler
                     "¡Falla en los sistemas de física!",
                     playBackground: true
                 );
-                Timing.RunCoroutine(GhostlyAnomaly(45f));
+                _currentEventCoroutine = Timing.RunCoroutine(GhostlyAnomaly(45f));
                 break;
 
             case 1:
@@ -108,7 +135,7 @@ public class AnomalyHandler : CustomEventsHandler
                     "Atención, peligro biológico detectado, nivel de adrenalina crítico.",
                     playBackground: true
                 );
-                Timing.RunCoroutine(SpeedAnomaly(120f));
+                _currentEventCoroutine = Timing.RunCoroutine(SpeedAnomaly(120f));
                 break;
 
             case 2:
@@ -120,7 +147,7 @@ public class AnomalyHandler : CustomEventsHandler
                     "Falla detectada en el sistema de energía de la instalación.",
                     playBackground: true
                 );
-                Timing.RunCoroutine(BlackoutAnomaly(60f));
+                _currentEventCoroutine = Timing.RunCoroutine(BlackoutAnomaly(60f));
                 break;
 
             case 3:
@@ -133,7 +160,7 @@ public class AnomalyHandler : CustomEventsHandler
                     playBackground: true
                 );
 
-                Timing.RunCoroutine(DiscoAnomaly(60f));
+                _currentEventCoroutine = Timing.RunCoroutine(DiscoAnomaly(60f));
                 break;
 
             case 4:
@@ -146,7 +173,7 @@ public class AnomalyHandler : CustomEventsHandler
                     playBackground: true
                 );
 
-                Timing.RunCoroutine(SmallAnomaly(duration: 90f));
+                _currentEventCoroutine = Timing.RunCoroutine(SmallAnomaly(duration: 90f));
                 break;
 
             case 5:
@@ -159,7 +186,7 @@ public class AnomalyHandler : CustomEventsHandler
                     playBackground: true
                 );
 
-                Timing.RunCoroutine(GigantAnomaly(duration: 90f));
+                _currentEventCoroutine = Timing.RunCoroutine(GigantAnomaly(duration: 90f));
                 break;
 
             case 6:
@@ -172,7 +199,7 @@ public class AnomalyHandler : CustomEventsHandler
                     playBackground: true
                 );
 
-                Timing.RunCoroutine(CrazyDoorsAnomaly(duration: 60f));
+                _currentEventCoroutine = Timing.RunCoroutine(CrazyDoorsAnomaly(duration: 60f));
                 break;
 
             case 7:
@@ -185,7 +212,7 @@ public class AnomalyHandler : CustomEventsHandler
                     playBackground: true
                 );
 
-                Timing.RunCoroutine(SwapAnomaly(duration: 60f));
+                _currentEventCoroutine = Timing.RunCoroutine(SwapAnomaly(duration: 60f));
                 break;
         }
     }
